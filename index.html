@@ -752,7 +752,68 @@ function resetTest() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ══════════════════════════════════════════════
+//  뒤로가기 지원 (History API)
+// ══════════════════════════════════════════════
+
+// 페이지 전환 시 history에 상태 기록
+function pushHistory(page) {
+  history.pushState({ page }, '', '');
+}
+
+// 뒤로가기 버튼 누를 때 처리
+window.addEventListener('popstate', function(e) {
+  // 모달이 열려 있으면 모달만 닫기
+  if (modalContainer.innerHTML !== '') {
+    modalContainer.innerHTML = '';
+    render();
+    return;
+  }
+  // 페이지별 뒤로가기 동작
+  if (state.page === 'quiz') {
+    if (state.currentQ > 0) {
+      state.currentQ--;
+      state.answers.pop();
+      render();
+      pushHistory('quiz');
+    } else {
+      state.page = 'start';
+      state.answers = [];
+      render();
+    }
+  } else if (state.page === 'analyzing' || state.page === 'result') {
+    state.page = 'start';
+    state.answers = [];
+    state.currentQ = 0;
+    state.resultType = null;
+    state.lettersOpened = [false, false, false];
+    modalContainer.innerHTML = '';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+// startQuiz, selectOption, goResult에 history push 추가
+const _origStartQuiz = startQuiz;
+startQuiz = function() {
+  _origStartQuiz();
+  pushHistory('quiz');
+};
+
+const _origSelectOption = selectOption;
+selectOption = function(label) {
+  _origSelectOption(label);
+  if (state.page === 'quiz') pushHistory('quiz');
+};
+
+const _origGoResult = goResult;
+goResult = function() {
+  _origGoResult();
+  pushHistory('result');
+};
+
 // ── 시작 ──
+history.replaceState({ page: 'start' }, '', '');
 render();
 </script>
 </body>
