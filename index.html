@@ -663,7 +663,7 @@ function renderResult() {
             <h3 style="margin-bottom: 4px;">${l.cardSub}</h3>
             <p style="font-size: 14px;">${l.cardDesc}</p>
             ${state.lettersOpened[i]
-              ? `<button class="letter-open-btn done" disabled>열람 완료 ✓</button>`
+              ? `<button class="letter-open-btn" onclick="openLetter(${i})" style="color:#8b9e8a; border-color:#b8cbb6; background:#f0f5ef;">열람 완료 ✓ &nbsp;(다시 보기)</button>`
               : `<button class="letter-open-btn" onclick="openLetter(${i})">열람하기</button>`
             }
           </div>
